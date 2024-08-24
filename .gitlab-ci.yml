@@ -1,0 +1,70 @@
+stages:  
+  - build  
+  - test  
+  - deploy  
+  
+variables:  
+  DOCKER_DRIVER: overlay2  
+  AWS_REGION: "us-west-2"  # Specify your AWS region  
+  EKS_CLUSTER_NAME: "your-eks-cluster-name"  
+  KUBECONFIG: "/root/.kube/config"  
+  
+before_script:  
+  - apk add --no-cache python3 py3-pip  
+  - pip3 install awscli  
+  - aws --version  
+  - export PATH=$PATH:/usr/local/bin  
+  - apk add --no-cache curl jq bash  
+  - curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"  
+  - chmod +x ./kubectl  
+  - mv ./kubectl /usr/local/bin/kubectl  
+  - curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/latest/download/aws-iam-authenticator_$(uname -s)_amd64  
+  - chmod +x ./aws-iam-authenticator  
+  - mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator  
+  
+build_frontend:  
+  stage: build  
+  image: node:14  
+  script:  
+    - cd frontend  
+    - npm install  
+    - npm run build  
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA .  
+    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA  
+  only:  
+    - master  
+  
+build_backend:  
+  stage: build  
+  image: golang:1.16  
+  script:  
+    - cd backend  
+    - go mod download  
+    - go build -o main .  
+    - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA .  
+    - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA  
+  only:  
+    - master  
+  
+test:  
+  stage: test  
+  image: node:14  
+  script:  
+    - cd frontend  
+    - npm install  
+    - npm test  
+  only:  
+    - master  
+  
+deploy:  
+  stage: deploy  
+  image: google/cloud-sdk:alpine  
+  script:  
+    - aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME  
+    - cd k8s  
+    - sed -i "s|<FRONTEND_IMAGE>|$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA|g" frontend-deployment.yaml  
+    - sed -i "s|<BACKEND_IMAGE>|$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA|g" backend-deployment.yaml  
+    - kubectl apply -f frontend-deployment.yaml  
+    - kubectl apply -f backend-deployment.yaml  
+  only:  
+    - main  
