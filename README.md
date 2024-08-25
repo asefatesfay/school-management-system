@@ -65,7 +65,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 |                  |                    
 +------------------+                
 ## Database ER diagram
-![Database ER Diagrm](./docs/img/shcool-management-ER.png)
+<img src="./docs/img/school-management-ER.png" alt="Database ER diagram" />
 ### Frontend (React + Next.js)
 * **Components:** User interfaces for students, teachers, parents, and admins.
 * **State Management**: Context API or Redux to manage the state.
