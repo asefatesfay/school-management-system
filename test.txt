@@ -1,0 +1,111 @@
+CREATE TABLE Students (  
+    StudentID SERIAL PRIMARY KEY,  
+    FirstName VARCHAR(50),  
+    LastName VARCHAR(50),  
+    BirthDate DATE,  
+    Email VARCHAR(100),  
+    PhoneNumber VARCHAR(15),  
+    EnrollmentDate DATE,  
+    ClassID INT  
+);  
+  
+CREATE TABLE Parents (  
+    ParentID SERIAL PRIMARY KEY,  
+    FirstName VARCHAR(50),  
+    LastName VARCHAR(50),  
+    Email VARCHAR(100),  
+    PhoneNumber VARCHAR(15)  
+);  
+  
+CREATE TABLE StudentParents (  
+    StudentID INT,  
+    ParentID INT,  
+    PRIMARY KEY (StudentID, ParentID),  
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),  
+    FOREIGN KEY (ParentID) REFERENCES Parents(ParentID)  
+);  
+  
+CREATE TABLE Classes (  
+    ClassID SERIAL PRIMARY KEY,  
+    ClassName VARCHAR(50),  
+    YearLevel INT  
+);  
+  
+CREATE TABLE Subjects (  
+    SubjectID SERIAL PRIMARY KEY,  
+    SubjectName VARCHAR(50)  
+);  
+  
+CREATE TABLE Lessons (  
+    LessonID SERIAL PRIMARY KEY,  
+    SubjectID INT,  
+    TeacherID INT,  
+    ClassID INT,  
+    LessonDate DATE,  
+    StartTime TIME,  
+    EndTime TIME,  
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),  
+    FOREIGN KEY (TeacherID) REFERENCES Teachers(TeacherID),  
+    FOREIGN KEY (ClassID) REFERENCES Classes(ClassID)  
+);  
+  
+CREATE TABLE Exams (  
+    ExamID SERIAL PRIMARY KEY,  
+    SubjectID INT,  
+    ClassID INT,  
+    ExamDate DATE,  
+    StartTime TIME,  
+    EndTime TIME,  
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),  
+    FOREIGN KEY (ClassID) REFERENCES Classes(ClassID)  
+);  
+  
+CREATE TABLE Assignments (  
+    AssignmentID SERIAL PRIMARY KEY,  
+    SubjectID INT,  
+    ClassID INT,  
+    Title VARCHAR(100),  
+    Description TEXT,  
+    DueDate DATE,  
+    FOREIGN KEY (SubjectID) REFERENCES Subjects(SubjectID),  
+    FOREIGN KEY (ClassID) REFERENCES Classes(ClassID)  
+);  
+  
+CREATE TABLE Results (  
+    ResultID SERIAL PRIMARY KEY,  
+    StudentID INT,  
+    ExamID INT,  
+    Score DECIMAL(5,2),  
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),  
+    FOREIGN KEY (ExamID) REFERENCES Exams(ExamID)  
+);  
+  
+CREATE TABLE Attendance (  
+    AttendanceID SERIAL PRIMARY KEY,  
+    StudentID INT,  
+    LessonID INT,  
+    Status VARCHAR(10),  
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),  
+    FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID)  
+);  
+  
+CREATE TABLE Events (  
+    EventID SERIAL PRIMARY KEY,  
+    EventName VARCHAR(100),  
+    EventDate DATE,  
+    StartTime TIME,  
+    EndTime TIME,  
+    Description TEXT  
+);  
+  
+CREATE TABLE Messages (  
+    MessageID SERIAL PRIMARY KEY,  
+    SenderID INT,  
+    SenderType VARCHAR(10),  
+    ReceiverID INT,  
+    ReceiverType VARCHAR(10),  
+    Subject VARCHAR(100),  
+    Body TEXT,  
+    SentDateTime TIMESTAMP,  
+    IsRead BOOLEAN DEFAULT FALSE  
+); 

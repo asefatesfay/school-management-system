@@ -64,7 +64,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 |  (Kubernetes)    |                    
 |                  |                    
 +------------------+                
- 
+## Database ER diagram
+![Database ER Diagrm](docs/img/shcool-management-ER.png)
 ### Frontend (React + Next.js)
 * **Components:** User interfaces for students, teachers, parents, and admins.
 * **State Management**: Context API or Redux to manage the state.
