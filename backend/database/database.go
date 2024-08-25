@@ -2,8 +2,10 @@ package database
 
 import (
 	"log"
+	"os"
 	"sync"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -14,8 +16,12 @@ var (
 )
 
 func GetDB() *gorm.DB {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	once.Do(func() {
-		dsn := "postgres://school:schoolmanagement@localhost:5432/schoolmanagement"
+		dsn := os.Getenv("DATABASE_URL")
 		if dsn == "" {
 			log.Fatal("DATABASE_URL environment variable is required")
 		}
